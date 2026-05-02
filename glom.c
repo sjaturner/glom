@@ -40,7 +40,7 @@ int main(int argc, char *argv[])
 
         for (int group_index = 0; group_index < group_count; ++group_index)
         {
-            char *tokens[MAX_TOKENS];
+            char *tokens[MAX_TOKENS] = { };
             int token_count = 0;
             while (token_count < groups[group_index])
             {
@@ -54,11 +54,6 @@ int main(int argc, char *argv[])
                 else if (*token == '\0')
                 {
                     continue; /* Runs of spaces are simply treated as a single space. */
-                }
-                else if (token_count >= MAX_TOKENS)
-                {
-                    fprintf(stderr, "MAX_TOKENS exceeded\n");
-                    exit(EXIT_FAILURE);
                 }
                 else
                 {
