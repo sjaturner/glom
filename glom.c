@@ -1,14 +1,21 @@
+#include <errno.h>
 #include <stdio.h>
-#include <string.h>
 #include <stdlib.h>
+#include <string.h>
 
 int main(int argc, char *argv[])
 {
+    if (argc < 2)
+    {
+        fprintf(stderr, "This gloms hex octets together in group sizes specified as values on the command line\n");
+        exit(EXIT_FAILURE);
+    }
+
     enum
     {
         MAX_TOKENS = 0x20,
     };
-    int *groups = calloc(argc, sizeof(int));
+    unsigned long *groups = calloc(argc, sizeof(unsigned long));
     if (!groups)
     {
         fprintf(stderr, "A small calloc failed, expect big trouble\n");
@@ -19,14 +26,22 @@ int main(int argc, char *argv[])
 
     for (int arg_index = 1; arg_index < argc; ++arg_index)
     {
-        int val = atoi(argv[arg_index]);
+        char *end = NULL;
+        errno = 0;
 
-        if (val < 1 || val > MAX_TOKENS)
+        unsigned long val = strtoul(argv[arg_index], &end, 10);
+
+        if (argv[arg_index][0] == '\0' || *end != '\0' || errno != 0)
         {
-            fprintf(stderr, "group lengths must be integer values in the range 1 to %d\n", MAX_TOKENS);
+            fprintf(stderr, "Invalid integer argument '%s'\n", argv[arg_index]);
             exit(EXIT_FAILURE);
         }
 
+        if (val < 1 || val > MAX_TOKENS)
+        {
+            fprintf(stderr, "Group lengths must be integer values in the range 1 to %d\n", MAX_TOKENS);
+            exit(EXIT_FAILURE);
+        }
         groups[group_count++] = val;
     }
 
@@ -40,8 +55,8 @@ int main(int argc, char *argv[])
 
         for (int group_index = 0; group_index < group_count; ++group_index)
         {
-            char *tokens[MAX_TOKENS] = { };
-            int token_count = 0;
+            char *tokens[MAX_TOKENS]; /* No need to set to zero. */
+            unsigned long token_count = 0;
             while (token_count < groups[group_index])
             {
                 char *token = strsep(&scan, " \r\n");
@@ -61,7 +76,7 @@ int main(int argc, char *argv[])
                 }
             }
 
-            for (int index = 0; index < token_count; ++index)
+            for (unsigned long index = 0; index < token_count; ++index)
             {
                 printf("%s", tokens[reverse ? token_count - index - 1 : index]);
             }
