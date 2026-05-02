@@ -2,6 +2,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <limits.h>
 
 int main(int argc, char *argv[])
 {
@@ -15,7 +16,7 @@ int main(int argc, char *argv[])
     {
         MAX_TOKENS = 0x20,
     };
-    unsigned long *groups = calloc(argc, sizeof(unsigned long));
+    int *groups = calloc(argc, sizeof(int));
     if (!groups)
     {
         fprintf(stderr, "A small calloc failed, expect big trouble\n");
@@ -31,7 +32,7 @@ int main(int argc, char *argv[])
 
         unsigned long val = strtoul(argv[arg_index], &end, 10);
 
-        if (argv[arg_index][0] == '\0' || *end != '\0' || errno != 0)
+        if (argv[arg_index][0] == '\0' || *end != '\0' || errno != 0 || val > INT_MAX)
         {
             fprintf(stderr, "Invalid integer argument '%s'\n", argv[arg_index]);
             exit(EXIT_FAILURE);
@@ -42,7 +43,7 @@ int main(int argc, char *argv[])
             fprintf(stderr, "Group lengths must be integer values in the range 1 to %d\n", MAX_TOKENS);
             exit(EXIT_FAILURE);
         }
-        groups[group_count++] = val;
+        groups[group_count++] = (int)val;
     }
 
     char *line = NULL;
@@ -56,7 +57,7 @@ int main(int argc, char *argv[])
         for (int group_index = 0; group_index < group_count; ++group_index)
         {
             char *tokens[MAX_TOKENS]; /* No need to set to zero. */
-            unsigned long token_count = 0;
+            int token_count = 0;
             while (token_count < groups[group_index])
             {
                 char *token = strsep(&scan, " \r\n");
@@ -76,7 +77,7 @@ int main(int argc, char *argv[])
                 }
             }
 
-            for (unsigned long index = 0; index < token_count; ++index)
+            for (int index = 0; index < token_count; ++index)
             {
                 printf("%s", tokens[reverse ? token_count - index - 1 : index]);
             }
