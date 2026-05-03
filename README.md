@@ -24,7 +24,7 @@ Octave / Matlab ingests without further ado.
 
 # An example
 
-The operation is easy to explain in terms of an example.
+The operation is easy to explain in terms of an example:
 
     :; cat example
     1777806699.117235 aa bb cc dd ee ff 00 11 22 33 44 55 66
@@ -33,7 +33,7 @@ The operation is easy to explain in terms of an example.
     1777806699.117235 bbaa ffeeddcc 1100 3322 5544
     1777806699.117456 2211 66554433 8877 1099 1211
 
-In this case, the interesting part of the payload comprises
+In this case, the interesting part of the payload comprises:
 
     An octet   (1 byte)
     A uint16_t (2 bytes)
@@ -45,7 +45,7 @@ In this case, the interesting part of the payload comprises
 Those type widths are in the command line arguments but notice that the
 first argument is 1, to allow the epoch to pass straight through. You
 will note that the bytes have been re-ordered to cope with the native
-little- endian format in the payload.
+little-endian format in the payload.
 
 The next pipeline stage will convert those hex values to decimal integers.
 
