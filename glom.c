@@ -45,6 +45,12 @@
  *
  * The next pipeline stage will convert those hex values to decimal integers.
  *
+ * Here is a simple example of that conversion, using GAWK.
+ *
+ *    :; cat example | ./glom 1 2 4 2 2 2 | gawk '{printf("%s ", $1); for (x = 2; x <= NF; ++x) printf("%d ", strtonum("0x" $x));printf("\n");}'
+ *    1777806699.117235 48042 4293844428 4352 13090 21828
+ *    1777806699.117456 8721 1716864051 34935 4249 4625
+ *
  * I have public GitHub repos which can deal with structs and convert to JSON,
  * etc. but find that for most simple case, this is the sweet spot for dealing
  * with ad-hoc debug.
