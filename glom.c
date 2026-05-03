@@ -80,12 +80,7 @@ int main(int argc, char *argv[])
         return EXIT_FAILURE;
     }
 
-    int *groups = calloc(argc, sizeof(int));
-    if (!groups)
-    {
-        fprintf(stderr, "A small calloc failed, expect big trouble\n");
-        exit(EXIT_FAILURE);
-    }
+    int groups[argc];
     int group_count = 0;
     int reverse = 1; /* Normal case, Intel byte ordering. I will change this and recompile if I need Motorola ordering - which is unlikely. */
 
