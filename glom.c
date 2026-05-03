@@ -66,18 +66,19 @@
 #include <string.h>
 #include <limits.h>
 
+enum
+{
+    MAX_GROUP_SIZE = 64,
+};
 int main(int argc, char *argv[])
 {
     if (argc < 2)
     {
-        fprintf(stderr, "This gloms hex octets together in group sizes specified as values on the command line\n");
-        exit(EXIT_FAILURE);
+        fprintf(stderr, "Usage: %s <size1> <size2> ... <sizeN> < stdin\n", argv[0]);
+        fprintf(stderr, "Example: cat data | %s 1 2 4\n", argv[0]);
+        return EXIT_FAILURE;
     }
 
-    enum
-    {
-        MAX_TOKENS = 0x20,
-    };
     int *groups = calloc(argc, sizeof(int));
     if (!groups)
     {
@@ -91,19 +92,12 @@ int main(int argc, char *argv[])
     {
         char *end = NULL;
         errno = 0;
+        long val = strtol(argv[arg_index], &end, 10);
 
-        unsigned long val = strtoul(argv[arg_index], &end, 10);
-
-        if (argv[arg_index][0] == '\0' || *end != '\0' || errno != 0 || val > INT_MAX)
+        if (*end != '\0' || errno != 0 || val < 1 || val > MAX_GROUP_SIZE)
         {
-            fprintf(stderr, "Invalid integer argument '%s'\n", argv[arg_index]);
-            exit(EXIT_FAILURE);
-        }
-
-        if (val < 1 || val > MAX_TOKENS)
-        {
-            fprintf(stderr, "Group lengths must be integer values in the range 1 to %d\n", MAX_TOKENS);
-            exit(EXIT_FAILURE);
+            fprintf(stderr, "Invalid group size '%s' (must be 1..%d)\n", argv[arg_index], MAX_GROUP_SIZE);
+            return EXIT_FAILURE;
         }
         groups[group_count++] = (int)val;
     }
@@ -118,7 +112,7 @@ int main(int argc, char *argv[])
 
         for (int group_index = 0; group_index < group_count; ++group_index)
         {
-            char *tokens[MAX_TOKENS]; /* No need to set to zero. */
+            char *tokens[MAX_GROUP_SIZE]; /* No need to set to zero. */
             int token_count = 0;
             while (token_count < groups[group_index])
             {
@@ -127,6 +121,7 @@ int main(int argc, char *argv[])
                 if (!token)
                 {
                     fprintf(stderr, "Insufficient tokens on line %d\n", line_number);
+                    free(line);
                     exit(EXIT_FAILURE);
                 }
                 else if (*token == '\0')
@@ -153,6 +148,5 @@ int main(int argc, char *argv[])
     }
 
     free(line);
-    free(groups);
     exit(EXIT_SUCCESS);
 }
