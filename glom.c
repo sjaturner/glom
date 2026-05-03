@@ -68,8 +68,9 @@
 
 enum
 {
-    MAX_GROUP_SIZE = 64,
+    MAX_GROUP_SIZE = 64, /* I cannot see much call for anything larger than eight, for uint64_t ... */
 };
+
 int main(int argc, char *argv[])
 {
     if (argc < 2)
@@ -92,7 +93,7 @@ int main(int argc, char *argv[])
     {
         char *end = NULL;
         errno = 0;
-        long val = strtol(argv[arg_index], &end, 10);
+        long val = strtol(argv[arg_index], &end, 0);
 
         if (*end != '\0' || errno != 0 || val < 1 || val > MAX_GROUP_SIZE)
         {
@@ -116,12 +117,11 @@ int main(int argc, char *argv[])
             int token_count = 0;
             while (token_count < groups[group_index])
             {
-                char *token = strsep(&scan, " \r\n");
+                char *token = strsep(&scan, " \t\r\n");
 
                 if (!token)
                 {
                     fprintf(stderr, "Insufficient tokens on line %d\n", line_number);
-                    free(line);
                     exit(EXIT_FAILURE);
                 }
                 else if (*token == '\0')
@@ -147,6 +147,5 @@ int main(int argc, char *argv[])
         printf("\n");
     }
 
-    free(line);
     exit(EXIT_SUCCESS);
 }
